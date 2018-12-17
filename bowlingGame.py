@@ -9,7 +9,17 @@ class bowlingGame():
     def __init__(self):
         self.start()
         
-    def roll(self,pinDown):
+    def roll(self, *args):
+        if args:
+            for pinDown in args: 
+                if pinDown >= 0 and pinDown <= 10 and type(pinDown) == int:
+                    self.makeOneRoll(pinDown)
+                else:
+                    print("You can't possibly knock '"+str(pinDown)+"' pin(s) down. Try again!")
+        else:
+            print("You forgot to make a roll. Please try again and knock some pins down!")
+        
+    def makeOneRoll(self,pinDown):
         frameIndex = self.frame-1
         self.everyRollScoreList.append(pinDown)
         self.addScoreToPreviousFrames(pinDown)
@@ -132,16 +142,14 @@ def test_strikeFrame():
 def test_spareFrame():
     printTestTitle("Tests spare frame (frame 1) will add the next two scores")
     game = bowlingGame()
-    for pinDown in [8,2,5,4]:
-        game.roll(pinDown)
+    game.roll(8,2,5,4)
     game.printRolls()
     game.printCurrentState()
     assert (game.frameScoreList[0] == 15), "Frame 1 Score is not correct"
     
     printTestTitle("Tests spare frame (frame 2) will add the next two scores")
     game = bowlingGame()
-    for pinDown in [10,5,5,7,3]:
-        game.roll(pinDown)
+    game.roll(10,5,5,7,3)
     game.printRolls()
     game.printCurrentState()
     assert (game.frameScoreList[1] == 17), "Frame 2 Score is not correct"
@@ -159,9 +167,7 @@ def test_spareInTenth():
     game = bowlingGame()
     for i in range(9):
         game.roll(10)
-    game.roll(7)
-    game.roll(3)
-    game.roll(5)
+    game.roll(7,3,5)
     game.printRolls()
     game.printCurrentState()
     assert (game.getTotalScore() == 272), "Total Score for game is not correct"
@@ -174,3 +180,19 @@ def test_mixOfEverything():
     game.printRolls()
     game.printCurrentState()
     assert (game.getTotalScore() == 131), "Total Score for game is not correct"
+
+def test_invalidRolls():
+    printTestTitle("Tests some invalid rolls: 11, -1, 'abc', or empty roll")
+    game = bowlingGame()
+    for pinDown in [11,-1,'abc']:
+        game.roll(pinDown)
+        # roll should not have counted
+        assert (game.frame == 1), "Should still be in frame 1"
+        assert (game.rollNum == 1), "Should be first roll in frame 2"
+        assert (game.getTotalScore() == 0), "Total Score should remain at 0"
+    game.roll()
+    assert (game.frame == 1), "Should still be in frame 1"
+    assert (game.rollNum == 1), "Should be first roll in frame 2"
+    assert (game.getTotalScore() == 0), "Total Score should remain at 0"
+    game.printRolls()
+    game.printCurrentState()
