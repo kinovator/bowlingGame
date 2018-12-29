@@ -12,7 +12,7 @@ class bowlingGame():
     def roll(self, *args):
         if args:
             for pinDown in args: 
-                if pinDown >= 0 and pinDown <= 10 and type(pinDown) == int:
+                if type(pinDown) == int and pinDown >= 0 and pinDown <= 10:
                     self.makeOneRoll(pinDown)
                 else:
                     print("You can't possibly knock '"+str(pinDown)+"' pin(s) down. Try again!")
